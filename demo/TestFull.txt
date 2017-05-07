@@ -1,0 +1,33 @@
+﻿// CEQ Move Ein paar Punkte definieren
+A(130|150), B(230|210), C(180|215), D(400|200).
+
+Mid = proc(A,B)
+    {X,Y} <- A°B n B°A;
+    {M} <- (X--Y) n (A--B);
+end;
+
+Circle = proc(A,B,C)
+	{X,X'} <- A°B n B°A;
+	{Y,Y'} <- B°C n C°B;
+	{M}    <- (X--X') n (Y--Y');
+end;
+
+Center = proc(C) {A,B,C} <- C; Circle(A,B,C); end;
+
+CEQ = proc(A,B,C)
+	{D} <- A°B n B°A,
+        D--B, B°C,
+	{E} <- (D--B) n B°C,
+        D--A, D°E,
+	{F} <- (D--A) n D°E.
+	A°F;
+end;
+
+Move = proc(C,A) 
+	M = Center(C);
+	{B} <- C;
+	CEQ(A,M,B);
+end;
+
+K = (Circle(A,B,C))°A.
+Move(K,D).
