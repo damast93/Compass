@@ -30,7 +30,7 @@ Statements have the following forms
    A(20|50)
    ```
 
-   defines a *named pointed* "A" and assigns it to the variable `A`. 
+   defines a *named pointed* "A" and assigns it to the variable `A`. A named point will, when drawn, have its name displayed alongside it.
 
 2. **Assignments**
 
