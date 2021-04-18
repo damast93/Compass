@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Compass": {
+      "commandName": "Project",
+      "commandLineArgs": "Samples\\Midpoint.txt"
+    }
+  }
+}

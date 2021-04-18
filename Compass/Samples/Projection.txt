@@ -1,0 +1,20 @@
+﻿// Projection onto a line
+
+A(100|150), B(240|200), C(190|90).
+
+// find midpoint 
+Mid = proc(A,B)
+    A°B, B°A,
+    {X,Y} <- A°B n B°A; 
+    {P} <- X--Y n A--B;
+end;
+
+// orthogonal projection
+Proj = proc(A,B,P)
+	K = (Mid(A,P))°A,
+	{X} <- (K n A--B) \ {A};
+end;
+
+A--B,
+"X"=Proj(A,B,C),
+A-C,C-X,X-A.

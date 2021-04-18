@@ -1,0 +1,41 @@
+﻿<Window x:Class="MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Height="486" Width="804" Title="Compass &amp; Straightedge">
+    <Window.CommandBindings>
+        <CommandBinding Command="Print" Executed="CommandBinding_Executed" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="F5" Command="Print"/>
+    </Window.InputBindings>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="6*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border BorderBrush="Silver" 
+                Grid.Column="0" Grid.RowSpan="2"
+                BorderThickness="3" >
+            <Canvas Name="BackgroundCanvas"  Background="#FFFFF8F8" 
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"/>
+        </Border>
+        <TextBox Name="txtSource"
+                 Grid.Column ="1" 
+                 Grid.Row="0"
+                 HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" AcceptsReturn="True" AcceptsTab="True"
+                 Text="A(100|100), B(300|200). A--B." FontFamily="Consolas" />
+
+        <ListBox Grid.Column="1" Grid.Row="1" x:Name="Samples" SelectionChanged="Samples_OnSelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>
