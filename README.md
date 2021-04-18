@@ -14,7 +14,7 @@ C2 = B°A; // circle around B through A
 {"M"}    <- (X1-X2) n (C1-C2) // compute intersection of lines, giving the midpoint of A and B
 ```
 
-
+![Screenshot of the Compass application](https://raw.githubusercontent.com/damast93/Compass/master/img/screenshot.png)
 
 ## Language
 
@@ -52,15 +52,13 @@ Statements have the following forms
    {A,B,C} <- M°P // pick three random points from a circle
    ```
    
-   
+4. **Bonus (Named assignments):** If we put quotation marks around a variable in an assignment, if it is assigned a point, the point is upgraded to a named point as in 
 
-**Bonus (Named assignments):** If we put quotation marks around a variable in an assignment, if it is assigned a point, the point is upgraded to a named point as in 
+   ```
+   {"X"} <- Line1 n Line2 
+   ```
 
-```
-{"X"} <- Line1 n Line2 
-```
-
-This, together with Named point definitions, is the only way of creating named points. 
+   This, together with Named point definitions, is the only way of creating named points. 
 
 ### Expressions 
 
@@ -159,11 +157,13 @@ end;
 P5-P1.
 ```
 
+![Construction of a regular pentagon](https://raw.githubusercontent.com/damast93/Compass/master/img/pentagon.png)
+
 ## Translation of a circle
 
-```c
-// CEQ Moves
+One can translate a circle to a different midpoint. This is a crucial step in the [Mohr-Mascheroni theorem](https://en.wikipedia.org/wiki/Mohr%E2%80%93Mascheroni_theorem) saying that every construction with compass and ruler is also possible without the ruler. The procedure displayed here taken from [Norbert Hungerbühler](https://www.jstor.org/stable/2974536?seq=1).
 
+```c
 A(130|150), B(230|210), C(180|215), D(400|200).
 
 Mid = proc(A,B)
@@ -198,7 +198,7 @@ K = (Circle(A,B,C))°A.
 Move(K,D).
 ```
 
-
+![Translation of a circle](https://raw.githubusercontent.com/damast93/Compass/master/img/translation.png)
 
 # Technical note
 
