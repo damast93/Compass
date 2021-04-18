@@ -161,8 +161,6 @@ P5-P1.
 
 ## Translation of a circle
 
-One can translate a circle to a different midpoint. This is a crucial step in the [Mohr-Mascheroni theorem](https://en.wikipedia.org/wiki/Mohr%E2%80%93Mascheroni_theorem) saying that every construction with compass and ruler is also possible without the ruler. The procedure displayed here is taken from [Norbert Hungerbühler](https://www.jstor.org/stable/2974536?seq=1).
-
 ```c
 A(130|150), B(230|210), C(180|215), D(400|200).
 
