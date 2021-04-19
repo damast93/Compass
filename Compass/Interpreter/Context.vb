@@ -1,13 +1,17 @@
-﻿Public Class Context
-    Private m_Engine As DisplayEngine
+﻿Imports Compass.Display
 
-    Public Sub New(engine As DisplayEngine)
-        m_Engine = engine
-    End Sub
+Namespace Interpreter
+    Public Class Context
+        Private m_Engine As DisplayEngine
 
-    Public ReadOnly Property Engine As DisplayEngine
-        Get
-            Return m_Engine
-        End Get
-    End Property
-End Class
+        Public Sub New(engine As DisplayEngine)
+            m_Engine = engine
+        End Sub
+
+        Public ReadOnly Property Engine As DisplayEngine
+            Get
+                Return m_Engine
+            End Get
+        End Property
+    End Class
+End Namespace

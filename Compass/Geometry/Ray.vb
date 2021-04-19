@@ -1,16 +1,20 @@
-﻿Public Class Ray
-    Inherits Line
+﻿Imports Compass.Maths
 
-    Public Sub New(a As Point, b As Point)
-        MyBase.New(a, b)
-    End Sub
+Namespace Geometry
+    Public Class Ray
+        Inherits Line
 
-    Public Overrides Sub Accept(visitor As ValueVisitor)
-        visitor.Visit(Me)
-    End Sub
+        Public Sub New(a As Point, b As Point)
+            MyBase.New(a, b)
+        End Sub
 
-    Protected Overrides Function ValidatePoint(pnt As Point) As Boolean
-        Return PointOnRay(pnt, Me)
-    End Function
+        Public Overrides Sub Accept(visitor As ValueVisitor)
+            visitor.Visit(Me)
+        End Sub
 
-End Class
+        Protected Overrides Function ValidatePoint(pnt As Point) As Boolean
+            Return PointOnRay(pnt, Me)
+        End Function
+
+    End Class
+End Namespace
