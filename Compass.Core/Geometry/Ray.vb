@@ -1,13 +1,11 @@
-﻿Imports Compass.Maths
+﻿Imports Compass.Core.Maths
 
 Namespace Geometry
-    Public Class Segment
+    Public Class Ray
         Inherits Line
 
-        Private ReadOnly m_Ray As Line
-
-        Public Sub New(start As Point, dest As Point)
-            MyBase.New(start, dest)
+        Public Sub New(a As Point, b As Point)
+            MyBase.New(a, b)
         End Sub
 
         Public Overrides Sub Accept(visitor As ValueVisitor)
@@ -15,7 +13,8 @@ Namespace Geometry
         End Sub
 
         Protected Overrides Function ValidatePoint(pnt As Point) As Boolean
-            Return PointOnSegment(pnt, Me)
+            Return PointOnRay(pnt, Me)
         End Function
+
     End Class
 End Namespace

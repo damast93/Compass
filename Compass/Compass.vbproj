@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Compass.Core\Compass.Core.vbproj" />
     <ProjectReference Include="..\Compass.Parser\Compass.Parser.fsproj" />
   </ItemGroup>
 
