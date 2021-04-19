@@ -1,4 +1,6 @@
 ﻿Imports System.IO
+Imports Compass.Display
+Imports Compass.Interpreter
 
 Class MainWindow
     Dim engine As DisplayEngine
