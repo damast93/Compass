@@ -1,4 +1,4 @@
-﻿Imports Compass.Geometry
+﻿Imports Compass.Core.Geometry
 Imports Parser
 
 Namespace Interpreter

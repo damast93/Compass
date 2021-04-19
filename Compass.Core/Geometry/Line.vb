@@ -1,4 +1,4 @@
-﻿Imports Compass.Maths
+﻿Imports Compass.Core.Maths
 
 Namespace Geometry
     Public Class Line

@@ -1,7 +1,8 @@
 ﻿Option Strict On
 
-Imports Compass.Geometry
-Imports Compass.Maths
+Imports Compass.Core.Display
+Imports Compass.Core.Geometry
+Imports Compass.Core.Maths
 Imports WPFLine = System.Windows.Shapes.Line
 
 Namespace Display

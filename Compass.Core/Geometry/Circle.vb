@@ -1,7 +1,7 @@
 ﻿Option Strict On
 
 Imports System.Math
-Imports Compass.Maths
+Imports Compass.Core.Maths
 
 Namespace Geometry
 

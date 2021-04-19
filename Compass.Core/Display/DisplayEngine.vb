@@ -1,4 +1,4 @@
-﻿Imports Compass.Geometry
+﻿Imports Compass.Core.Geometry
 
 Namespace Display
     Public MustInherit Class DisplayEngine

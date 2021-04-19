@@ -1,4 +1,4 @@
-﻿Imports Compass.Display
+﻿Imports Compass.Core.Display
 
 Namespace Interpreter
     Public Class Context
