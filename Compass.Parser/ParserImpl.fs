@@ -117,7 +117,7 @@ let ctor =
     parsec {
         let! exp1 = atom
         return! choice [
-            strws "°"   >>. atom |>> (fun exp2 -> CCircle(exp1, exp2))
+            (anyOf "o°" .>> ws)   >>. atom |>> (fun exp2 -> CCircle(exp1, exp2))
             attempt (strws "--") >>. atom |>> (fun exp2 -> CRay(exp1, exp2))
             attempt (strws "->") >>. atom |>> (fun exp2 -> CHalfRay(exp1, exp2))
             strws "-"   >>. atom |>> (fun exp2 -> CLine(exp1, exp2))
