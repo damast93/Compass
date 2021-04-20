@@ -1,0 +1,9 @@
+﻿A(200|100).
+B(300|200).
+
+Mid = proc(A,B)
+	{X,Y} <- A ° B n B ° A;
+	{N} <- A--B n X--Y;
+end;
+
+"M" = Mid(A, B).
