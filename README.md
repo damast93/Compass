@@ -60,7 +60,7 @@ Compass allows the following types of statement
    Any expression 
    
    ```
-expr
+   expr
    ```
    
    can serve as a statement. This is useful for drawing, and equivalent to an assignment
@@ -131,11 +131,11 @@ Midpoint(A,B)
 
 ### Display modes
 
-The result of each statement is automatically drawn, depending on the current display mode. Compass maintains a nonempty *stack* of display modes, where each mode is one of `on, off, force`. The *current mode* is the top mode on the stack. After running a statement, its result is drawn unless the current mode is `off`. 
+The result of each statement is automatically drawn, depending on the current display mode. Compass maintains a nonempty stack of display modes, where each mode is one of `on, off, force`. The *current mode* is the top mode on the stack. After running a statement, its result is drawn **unless the current mode is `off`**. 
 
-* The statements `display on, display off, displace force` set the current mode respectively. 
+* The statements `display on, display off, display force` set the current mode respectively. 
 * `display push` pushes (duplicates) the current mode, while `display pop` removes the current mode. 
-* While the current mode is `force`, it cannot be changed. 
+* While the current mode is `force`, it cannot be changed to anything other than `force`.  This allows us to see all intermediate results of a computation.
 
 Statement in Compass can be separated by either newlines, or the symbols `, . ; !`. 
 
