@@ -5,6 +5,7 @@ open Parser
 
 let ws = skipMany (anyOf " \t") 
 let commentLine = pstring "//" >>. skipRestOfLine true
+let skipCommentLines = skipMany (attempt (ws >>. (commentLine <|> (newline >>% ()))))
 
 let strws st = pstring st .>> ws
 let wstrws st = ws >>. pstring st .>> ws
@@ -29,7 +30,9 @@ let pntdef =
     } <?> "point definition"
 
 type VarType = Plain | Quoted
-let quotedOrUnquotedVarname = ((between (pstring "\"") (strws "\"") varname) |>> fun n -> (n,Quoted)) <|> (varname |>> fun n -> (n,Plain))
+let quotedOrUnquotedVarname = 
+      ((between (pstring "\"") (strws "\"") varname) |>> fun n -> (n, Quoted)) 
+  <|> (varname |>> fun n -> (n, Plain))
 
 let assignment =
     parsec { 
@@ -59,18 +62,28 @@ let mereExpression =
        return [ Assignment("ans", expr) ]
     } <?> "expression"   
 
-let statement = (pick <|> assignment <|> (attempt pntdef) <|> mereExpression) <?> "statement"
+let displayCommand = 
+   parsec {
+     do! skip (strws "display")
+     let! command = choice [
+       attempt (pstring "on") >>% DisplayCommand.On
+       attempt (pstring "off") >>% DisplayCommand.Off
+       attempt (pstring "push") >>% DisplayCommand.Push
+       attempt (pstring "pop") >>% DisplayCommand.Pop
+       pstring "force" >>% DisplayCommand.Force
+     ]
+    return [ Display(command) ]
+   }
 
 let stmsep = 
   ws >>.
-  (   (anyOf ",.;!") 
+  ((anyOf ",.;!") 
   <|> (commentLine >>% '.')
   <|> (newline >>% '.')
   <|> (eof >>% '.')
-  ) <?> "statement separator"
+  ) 
 
-let skipCommentLines = skipMany (attempt (ws >>. (commentLine <|> (newline >>% ()))))
-
+let statement = (pick <|> assignment <|> displayCommand <|> (attempt pntdef) <|> mereExpression) <?> "statement"
 let statementAndSeparator = attempt (ws >>. statement .>>. stmsep .>> skipCommentLines)
 
 let statements = 
