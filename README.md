@@ -49,7 +49,7 @@ Compass allows the following types of statement
    ```c
    {A,B,C} <- M°P // pick three random points from a circle
    ```
-*Named assignments:* If we put quotation marks around a variable in an assignment or pick assignment, if it is assigned a point, the point is upgraded to a named point as in 
+   *Named assignments:* If we put quotation marks around a variable in an assignment or pick assignment, if it is assigned a point, the point is upgraded to a named point as in 
 
    ```c
    {"X"} <- Line1 n Line2 // name the intersection point "X"
@@ -149,7 +149,7 @@ Statement in Compass can be separated by either newlines, or the symbols `, . ; 
 
   is equivalent to 
 
-  ```
+  ```c
   display push // store the current display mode
   display off // turn display mode off (unless force)
   e
