@@ -18,11 +18,9 @@ C2 = B°A; // circle around B through A
 
 ## Language
 
-A Compass program consists of a sequence of statements, separated by commas, semicola or periods. A statement followed by `;` is *silenced*, meaning its result will not be drawn. Otherwise, its result will be displayed. 
+A Compass program consists of a sequence of statements. The result of each statement is automatically drawn, depending on the current *display mode*.
 
-### Statements
-
-Statements have the following forms
+Compass allows the following types of statement
 
 1. **Named point definitions**
 
@@ -35,7 +33,7 @@ Statements have the following forms
 2. **Assignments**
 
    ```
-   X = <expr>
+   X = expr
    ```
 
    Assigns to the variable `X` the result of expression `<expr>`. Variables must begin with uppercase letters. The overall assignment evaluates to the variable `X`
@@ -43,7 +41,7 @@ Statements have the following forms
 3. **Pick assignments**
 
    ```
-   {X1, ..., XN} = <expr>
+   {X1, ..., XN} = expr
    ```
 
    If `<expr>` evaluates to a set, the pick assignment statement tries to pick N distinct elements from that set (in any order) and assigns them to variables `X1` to `XN`. The overall assignment evaluates to the last variable assigned. One can (experimentally) pick from infinite sets such as circles and lines; the points thus obtained are random
@@ -51,14 +49,39 @@ Statements have the following forms
    ```c
    {A,B,C} <- M°P // pick three random points from a circle
    ```
+*Named assignments:* If we put quotation marks around a variable in an assignment or pick assignment, if it is assigned a point, the point is upgraded to a named point as in 
+
+   ```c
+   {"X"} <- Line1 n Line2 // name the intersection point "X"
+   ```
    
-4. **Bonus (Named assignments):** If we put quotation marks around a variable in an assignment, if it is assigned a point, the point is upgraded to a named point as in 
+4. **Mere expressions**
+
+   Any expression 
+   
+   ```
+expr
+   ```
+   
+   can serve as a statement. This is useful for drawing, and equivalent to an assignment
+   
+   ```
+   ans = expr
+   ```
+   
+   into the special variable `ans`.
+   
+5. **Display commands** 
+
+   Those of statements of the form 
 
    ```
-   {"X"} <- Line1 n Line2 
+   display <cmd>
    ```
 
-   This, together with Named point definitions, is the only way of creating named points. 
+   where `<cmd>` is one of the commands `on, off, force, push, top`. See *Display modes*
+
+
 
 ### Expressions 
 
@@ -85,6 +108,7 @@ M o P // alternative syntax
 A n B // intersection
 A u B // union
 A \ B // subtraction
+{ X1, ..., XN } // set formation
 ```
 
 **Procedures**
@@ -103,9 +127,56 @@ end
 Midpoint(A,B)
 ```
 
+
+
+### Display modes
+
+The result of each statement is automatically drawn, depending on the current display mode. Compass maintains a nonempty *stack* of display modes, where each mode is one of `on, off, force`. The *current mode* is the top mode on the stack. After running a statement, its result is drawn unless the current mode is `off`. 
+
+* The statements `display on, display off, displace force` set the current mode respectively. 
+* `display push` pushes (duplicates) the current mode, while `display pop` removes the current mode. 
+* While the current mode is `force`, it cannot be changed. 
+
+Statement in Compass can be separated by either newlines, or the symbols `, . ; !`. 
+
+* Newline and `.` are equivalent for all purposes. They don't affect the current display mode
+
+* `;` evaluates the preceding statement(s) in `off` mode, thus silencing output. The program
+
+  ```
+  e;
+  ```
+
+  is equivalent to 
+
+  ```
+  display push // store the current display mode
+  display off // turn display mode off (unless force)
+  e
+  display pop // restore the previous display mode
+  ```
+
+* `!` evaluates the preceding statement(s) in `force` mode
+
+* `,` is syntactic sugar to repeat another separator, e.g.
+
+  ```
+  A, B, C;
+  ```
+
+  is equivalent to
+
+  ```
+  A; B; C
+  ```
+
+
+
 ## Datatypes
 
-The datatypes currently supported in Compass are: Point, NamedPoint, Circle, Line, Ray, Segment, PointSet, Lambda
+The datatypes currently supported in Compass are: Point, NamedPoint, Circle, Line, Ray, Segment, PointSet, Lambda.
+
+
 
 # More examples
 
