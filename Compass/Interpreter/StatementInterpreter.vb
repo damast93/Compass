@@ -23,8 +23,20 @@ Public Class StatementInterpreter : Implements StatementVisitor(Of Void)
     Public Function Assign(varname As String, expr As Expression) As Void Implements StatementVisitor(Of Void).Assign
         Dim lhs = expr.Accept(New ExpressionInterpreter(m_Scope, m_Context))
         DoAssign(varname, lhs)
+        Render(lhs)
         Return Nothing
     End Function
+
+    Private Sub Render(value As Value)
+        Dim mode = m_Context.Mode
+
+        If mode <> DisplayMode.Off Then
+            Dim geom = TryCast(value, Geometry)
+            If geom IsNot Nothing Then
+                geom.Accept(m_Context.Engine)
+            End If
+        End If
+    End Sub
 
     Public Function Pick(vars As IEnumerable(Of String), expr As Expression) As Void Implements StatementVisitor(Of Void).Pick
         Dim int = New ExpressionInterpreter(m_Scope, m_Context)
@@ -40,12 +52,27 @@ Public Class StatementInterpreter : Implements StatementVisitor(Of Void)
         For i = 0 To n - 1
             DoAssign(varList(i), pnts(i))
         Next
+
+        Render(pnts(n - 1))
         Return Nothing
     End Function
 
-    Public Function Display(arg As Expression) As Void Implements StatementVisitor(Of Void).Display
-        Dim x = arg.Accept(New ExpressionInterpreter(m_Scope, m_Context)).AsOf(Of Geometry)()
-        x.Accept(m_Context.Engine)
+    Public Function Display(command As Parser.DisplayCommand) As Void Implements StatementVisitor(Of Void).Display
+        Dim mode = m_Context.Mode
+
+        Select Case command
+            Case DisplayCommand.On
+                If mode <> DisplayMode.Force Then m_Context.Mode = DisplayMode.On
+            Case DisplayCommand.Off
+                If mode <> DisplayMode.Force Then m_Context.Mode = DisplayMode.Off
+            Case DisplayCommand.Force
+                m_Context.Mode = DisplayMode.Force
+            Case DisplayCommand.Push
+                m_Context.Modes.Push(m_Context.Mode)
+            Case DisplayCommand.Pop
+                m_Context.Modes.Pop()
+        End Select
+
         Return Nothing
     End Function
 

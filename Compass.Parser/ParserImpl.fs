@@ -3,149 +3,134 @@
 open FParsec    
 open Parser
 
-let ws = spaces >>. opt (pstring "//" >>. skipRestOfLine true) >>. spaces >>% ()
+let ws = skipMany (anyOf " \t") 
+let commentLine = pstring "//" >>. skipRestOfLine true
 
 let strws st = pstring st .>> ws
+let wstrws st = ws >>. pstring st .>> ws
 let skip p = p >>. (preturn ())
 let parsec = new ParserCombinator()
 
-let full term = ws >>. term .>> eof 
+let integer = (many1Satisfy isDigit) |>> int
 
-let integer = (many1Satisfy isDigit .>> ws) |>> int
-
-let varname = many1Satisfy2L isAsciiUpper (fun c -> isLetter c || isDigit c || c = '\'') "variable name" .>> ws
-
-(* Fwd decl *)
+let varname = many1Satisfy2L isAsciiUpper (fun c -> isLetter c || isDigit c || c = '\'') "variable name"
+let quotedVarname = between (pstring "\"") (strws "\"") varname
 
 let expression, expressionref = createParserForwardedToRef<Expression, unit>()
 let intersections, intersectionsref = createParserForwardedToRef<Expression, unit>()
 
 (* Statement parser *)
 
-type DispType = Disp | Silenced
+let pntdef = 
+    parsec { 
+        let! name = varname .>> ws
+        let! (x,y) = between (strws "(") (pstring ")") ((integer .>> strws "|") .>>. integer)
+        return [ Assignment(name, NamePnt(name, CPoint(x,y))) ]
+    } <?> "point definition"
 
-let stmsep = (newline >>. ws >>% Disp) <|> ((strws "," <|> strws ".") >>% Disp) <|> (eof >>% Disp) <|> (strws ";" >>% Silenced)
-
-let pntdef =
-    let pntdefint = parsec { 
-        let! name = varname
-        let! (x,y) = between (strws "(") (strws ")") ((integer .>> strws "|") .>>. integer)
-        let! sep = stmsep
-        return match sep with
-               | Silenced -> [Assignment(name, NamePnt(name,CPoint(x,y)))]
-               | Disp     -> [Assignment(name, NamePnt(name,CPoint(x,y))); Display(Var(name))]
-    }
-    pntdefint <?> "point definition"
+type VarType = Plain | Quoted
+let quotedOrUnquotedVarname = ((between (pstring "\"") (strws "\"") varname) |>> fun n -> (n,Quoted)) <|> (varname |>> fun n -> (n,Plain))
 
 let assignment =
-    let assignmentint = parsec { 
-        let! ((var, expn), sep) = (attempt (varname .>> strws "=")) .>>. expression .>>. stmsep
-        return match sep with
-               | Silenced -> [Assignment(var,expn)]
-               | Disp     -> [Assignment(var,expn); Display(Var(var))]
-    }
-    assignmentint <?> "assignment"
-
-let namedAssignment =
-    let namedAssignmentInt = parsec { 
-        let! ((var, expn), sep) = ((between (pstring "\"") (strws "\"") varname) .>> strws "=") .>>. expression .>>. stmsep
-        return match sep with
-               | Silenced -> [Assignment(var,NamePnt(var, expn))]
-               | Disp     -> [Assignment(var,NamePnt(var, expn)); Display(Var(var))]
-    }
-    namedAssignmentInt <?> "named assignment"
-
-type PickVar = Plain of string | Quoted of string
-    with
-        member this.VarName = 
-            match this with
-            | Plain(n) -> n
-            | Quoted(n) -> n
-let pickVarname = ((between (pstring "\"") (strws "\"") varname) |>> Quoted) <|> (varname |>> Plain)
-
+    parsec { 
+        let! ((name, vartype), rhs) = attempt (quotedOrUnquotedVarname .>> wstrws "=") .>>. expression
+        match vartype with
+        | Plain -> return [ Assignment(name, rhs) ]
+        | Quoted -> return [ Assignment(name, NamePnt(name, rhs)) ]
+    } <?> "assignment"
 
 let pick =
-    let pickint = parsec {
-       let! pickVars = between (strws "{") (strws "}") (sepBy1 pickVarname (strws ","))
-       let vars = pickVars |> List.map (fun v -> v.VarName)
+    parsec {
+       let! vars = attempt (between (strws "{") (pstring "}") (sepBy1 quotedOrUnquotedVarname (wstrws ",")) .>> wstrws "<-")
+       let! rhs = expression
+       let allnames = vars |> List.map fst
 
-       let nameStms = [
-           for var in pickVars do
-               match var with
-               | Quoted(n) -> yield Assignment(n, NamePnt(n, Var(n)))
+       return Pick(allnames, rhs) :: [
+           for (name,vartype) in vars do
+               match vartype with
+               | Quoted -> yield Assignment(name, NamePnt(name, Var(name)))
                | _         -> ()
        ]
+    } <?> "pick statement"
 
-       do! skip (strws "<-")
-       let! (expn, sep) = expression .>>. stmsep
-
-       return match sep with
-              | Silenced -> (Pick(vars, expn)) :: nameStms
-              | Disp     -> (Pick(vars, expn)) :: nameStms @ [ for var in vars do yield Display(Var(var)) ]
-    }
-    pickint <?> "pick expression"
-
-let blindExpn = 
-    let blindint = parsec {
+let mereExpression = 
+    parsec {
        let! expr = intersections
-       let! sep = stmsep
+       return [ Assignment("ans", expr) ]
+    } <?> "expression"   
 
-       return match sep with
-              | Silenced -> [Assignment("ans", expr)]
-              | Disp     -> [Assignment("ans", expr); Display(Var("ans"))]
-    }
-    blindint <?> "raw expression"   
+let statement = (pick <|> assignment <|> (attempt pntdef) <|> mereExpression) <?> "statement"
 
-let statement = (namedAssignment <|> (attempt pick) <|> (attempt pntdef) <|> assignment <|> blindExpn) <?> "statement"
-let statements = many1 statement |>> List.concat 
+let stmsep = 
+  ws >>.
+  (   (anyOf ",.;!") 
+  <|> (commentLine >>% '.')
+  <|> (newline >>% '.')
+  <|> (eof >>% '.')
+  ) <?> "statement separator"
+
+let skipCommentLines = skipMany (attempt (ws >>. (commentLine <|> (newline >>% ()))))
+
+let statementAndSeparator = attempt (ws >>. statement .>>. stmsep .>> skipCommentLines)
+
+let statements = 
+  parsec { 
+    do! skipCommentLines
+    let! statementsWithSeparators = many statementAndSeparator 
+    return [
+        for (stm, sep) in statementsWithSeparators do
+          match sep with
+          | '.' | ',' -> yield! stm // Improve `,`
+          | ';' -> 
+            yield Display(DisplayCommand.Push); yield Display(DisplayCommand.Off)
+            yield! stm
+            yield Display(DisplayCommand.Pop)
+          | '!' -> 
+            yield Display(DisplayCommand.Push); yield Display(DisplayCommand.Force)
+            yield! stm
+            yield Display(DisplayCommand.Pop)
+          | c -> failwith (sprintf "Internal Parser error, unknown statement separator `%c`" c)
+    ]
+  }
 
 (* Expression parser *)
 
 let var = varname |>> Var
 
-let sub = parsec {
-    let! pars  = (strws "proc" >>. between (strws "(") (strws ")") (sepBy varname (strws ",")))
-    let! cont = statements
-    do! skip (strws "end")
-    return Sub(pars, cont)
+let proc = parsec {
+    let! parameters  = (strws "proc" >>. between (strws "(") (pstring ")") (sepBy varname (wstrws ",")))
+    let! body = statements
+    do! skip (ws >>. pstring "end")
+    return Proc(parameters, body)
 }
 
-let set = between (strws "{") (strws "}") (sepBy intersections (strws ",")) |>> Set
-let atom = var <|> between (strws "(") (strws ")") expression <|> set
+let set = between (strws "{") (pstring "}") (sepBy intersections (strws ",")) |>> Set
+let atom = var <|> between (strws "(") (pstring ")") expression <|> set
 
 let ctor =
     parsec {
-        let! exp1 = atom
+        let! exp1 = atom .>> ws
         return! choice [
-            (anyOf "o°" .>> ws)   >>. atom |>> (fun exp2 -> CCircle(exp1, exp2))
+            (anyOf "o°" .>> ws) >>. atom |>> (fun exp2 -> CCircle(exp1, exp2))
             attempt (strws "--") >>. atom |>> (fun exp2 -> CRay(exp1, exp2))
             attempt (strws "->") >>. atom |>> (fun exp2 -> CHalfRay(exp1, exp2))
-            strws "-"   >>. atom |>> (fun exp2 -> CLine(exp1, exp2))
-            between (strws "(") (strws ")") (sepBy expression (strws ",")) |>> (fun args -> Funcall(exp1,args))
+            strws "-"  >>. atom |>> (fun exp2 -> CLine(exp1, exp2))
+            between (strws "(") (pstring ")") (sepBy expression (wstrws ",")) |>> (fun args -> Funcall(exp1,args))
             preturn exp1
         ]
     }
 
+let translateOperator exp (op, arg) = 
+    match op with
+    | 'n' -> Cap(exp,arg)
+    | 'u' -> Cup(exp,arg)
+    | '\\' -> Minus(exp,arg)
+    | c  -> failwith (sprintf "Internal parser error, unknown operator symbol `%c`" c)
+                     
 intersectionsref := parsec {
     let! exp1 = ctor
-    let! exprs = many ((anyOf "nu\\" .>> ws) .>>. expression)
-    return List.fold (fun exp (op, arg) -> 
-                          match op with
-                          | 'n' -> Cap(exp,arg)
-                          | 'u' -> Cup(exp,arg)
-                          | '\\' -> Minus(exp,arg)) exp1 exprs
+    let! exprs = many (attempt (ws >>. anyOf "nu\\" .>> ws) .>>. ctor)
+    return List.fold translateOperator exp1 exprs
 } 
 
-expressionref := sub <|> intersections
-
-let rec repl() = 
-    printf "> "
-    let input = System.Console.ReadLine().Trim() 
-    if input <> "" && input <> ":q" then
-        match run (full statements) input with
-            | Success(term, _, _)  -> 
-                printfn "> %A" term
-            | Failure(msg, _, _) -> printfn "Failure %A" msg
-        repl()
-    else
-        ()
+expressionref := proc <|> intersections

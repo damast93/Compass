@@ -56,7 +56,7 @@ Public Class ExpressionInterpreter : Implements ExpressionVisitor(Of Value)
         Return New NamedPoint(name, point.x, point.y)
     End Function
 
-    Public Function [Sub](pars As IEnumerable(Of String), body As IEnumerable(Of Statement)) As Value Implements ExpressionVisitor(Of Value).Sub
+    Public Function Proc(pars As IEnumerable(Of String), body As IEnumerable(Of Statement)) As Value Implements ExpressionVisitor(Of Value).Proc
         Dim parlist = pars.ToList()
 
         Dim scope = m_Scope

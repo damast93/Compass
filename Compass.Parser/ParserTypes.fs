@@ -3,8 +3,15 @@
 open FParsec
 open System.Collections.Generic
 
+type DisplayCommand =
+  | Off = 0
+  | On = 1
+  | Force = 2
+  | Push = 3
+  | Pop = 4
+
 type Expression =
-    | Sub     of string list * (Statement list)
+    | Proc    of string list * (Statement list) 
     | Var     of string
     | CPoint  of int * int
     | CLine   of Expression * Expression
@@ -20,7 +27,7 @@ type Expression =
         with
             member this.Accept(visitor : ExpressionVisitor<'T>) : 'T = 
                 match this with
-                | Sub(a,b)     -> visitor.Sub(a,b)
+                | Proc(a,b)    -> visitor.Proc(a,b)
                 | Var(n)       -> visitor.Var(n)
                 | CLine(a,b)   -> visitor.Line(a,b)
                 | CRay(a,b)    -> visitor.Ray(a,b)
@@ -36,8 +43,8 @@ type Expression =
 
 and Statement = 
     | Assignment of string * Expression
-    | Display    of Expression
     | Pick       of string list * Expression
+    | Display    of DisplayCommand
         with
             member this.Accept(visitor : StatementVisitor<'T>) : 'T =
                 match this with
@@ -46,7 +53,7 @@ and Statement =
                 | Display(a)      -> visitor.Display(a)
 
 and ExpressionVisitor<'T> = 
-    abstract Sub       : seq<string> * seq<Statement> -> 'T
+    abstract Proc      : seq<string> * seq<Statement> -> 'T
     abstract Var       : string -> 'T
     abstract Line      : Expression * Expression -> 'T
     abstract Ray       : Expression * Expression -> 'T
@@ -63,4 +70,4 @@ and ExpressionVisitor<'T> =
 and StatementVisitor<'T> = 
     abstract Assign  : string * Expression -> 'T
     abstract Pick    : seq<string> * Expression -> 'T
-    abstract Display : Expression -> 'T 
+    abstract Display : DisplayCommand -> 'T 
