@@ -115,14 +115,14 @@ let statements =
 let var = varname |>> Var
 
 let proc = parsec {
-    let! parameters  = (strws "proc" >>. between (strws "(") (pstring ")") (sepBy varname (wstrws ",")))
+    let! parameters  = (strws "proc" >>. between (strws "(") (strws ")") (sepBy (ws >>. varname .>> ws) (pstring ",")))
     let! body = statements
     do! skip (ws >>. pstring "end")
     return Proc(parameters, body)
 }
 
 let set = between (strws "{") (pstring "}") (sepBy intersections (strws ",")) |>> Set
-let atom = var <|> between (strws "(") (pstring ")") expression <|> set
+let atom = var <|> between (strws "(") (wstrws ")") expression <|> set
 
 let ctor =
     parsec {

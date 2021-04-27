@@ -15,7 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Testing.fs" />
     <Compile Include="ExpressionTests.fs" />
+    <Compile Include="StatementTests.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 
