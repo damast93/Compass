@@ -1,5 +1,9 @@
 ﻿module internal Parser.ParserImpl
 
+// make internals accessible to the test project
+[<assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Compass.Parser.Test")>]
+do()
+
 open FParsec    
 open Parser
 

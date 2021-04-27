@@ -1,0 +1,36 @@
+A(200|100);
+B(300|200);
+
+// Church encoding
+
+True = proc(A,B) A; end
+False = proc(A,B) B; end
+
+Pair = proc(A, B)
+  (proc(F) F(A, B). end).
+end
+
+Fst = proc(P)
+  P(True);
+end
+
+Snd = proc(P)
+  P(False);
+end
+
+P = Pair(A,B)
+
+Fst(P).
+Snd(P).
+
+// Circle stuff
+
+Circle = Pair
+
+ToCircle = proc(C)
+  (Fst(C)) o (Snd(C));
+end
+
+
+C = Circle(A, B) // Synthetic circle
+ToCircle(C).
