@@ -11,3 +11,5 @@ Name statements `"A"(X)`
 Point constructors `A = (1|1)`
 
 Unicode set-theory symbols?
+
+Resizable canvas

@@ -4,38 +4,39 @@ MD(250|180), P1(150|250).
 
 // midpoint between two points
 Mid = proc(A,B)
-	{X,Y} <- A°B n B°A;
-	{R} <- (X--Y) n (A--B);
-end;
+	{X,Y} <- A°B n B°A
+	{R} <- (X--Y) n (A--B)
+end
 
 // angle bisector
 HalfAngle = proc(A,B,C)
-	{D} <- (A°B) n (A->C);
-	X = Mid(B,D);
-	A->X;
-end;
+	{D} <- (A°B) n (A->C)
+	X = Mid(B,D)
+	A->X
+end
 
 // parallel line to A--B through P
 Parallel = proc(P,A,B)
-	{X} <- P°A n A--B;
-	{Y} <- X°P n A--B;
-	{R} <- Y°X n P°A;
-	P--R;
+	{X} <- P°A n A--B
+	{Y} <- X°P n A--B
+	{R} <- Y°X n P°A
+	P--R
 end;
 
 // make a 72° move from M-P
 Penta = proc(M,P)
-	{Q} <- ((P--M) n M°P) \ {P}.
-	{X,Y} <- P°Q n Q°P; 
-	{R} <- (X--Y) n M°P.
-	"S" = Mid(R,M).
-	{H} <- HalfAngle(S,M,P) n M--P.
-	{P2} <- Parallel(H,M,R) n M°P.
+	{Q} <- ((P--M) n M°P) \ {P};
+	{X,Y} <- P°Q n Q°P;
+	{R} <- (X--Y) n M°P;
+	"S" = Mid(R,M)
+	{H} <- HalfAngle(S,M,P) n M--P;
+	{P2} <- Parallel(H,M,R) n M°P;
 	P-P2, P2;
 end;
 
-"P2" = Penta(MD,P1).
-"P3" = Penta(MD,P2).
-"P4" = Penta(MD,P3).
-"P5" = Penta(MD,P4).
-P5-P1.
+"P2" = Penta(MD,P1)
+"P3" = Penta(MD,P2)
+"P4" = Penta(MD,P3)
+"P5" = Penta(MD,P4)
+
+P5-P1

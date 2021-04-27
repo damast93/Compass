@@ -3,19 +3,19 @@ B(300|200);
 
 // Church encoding
 
-True = proc(A,B) A; end
-False = proc(A,B) B; end
+True = proc(A,B) A. end
+False = proc(A,B) B. end
 
 Pair = proc(A, B)
-  (proc(F) F(A, B). end).
+  (proc(F) F(A, B). end)
 end
 
 Fst = proc(P)
-  P(True);
+  P(True)
 end
 
-Snd = proc(P)
-  P(False);
+Snd = proc(P) 
+  P(False)
 end
 
 P = Pair(A,B)
