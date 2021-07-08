@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Compass.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "Samples/ConsoleSample.txt"
+    }
+  }
+}
