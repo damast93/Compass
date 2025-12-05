@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.CompilerServices
-Imports Compass.Geometry
+Imports Compass.Core.Geometry
 
 Namespace Interpreter
 
